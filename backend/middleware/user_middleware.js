@@ -13,12 +13,17 @@ function usermiddleware(req,res,next){
        }
    
        try {
+            console.log("hii");
+            
            // Decode and verify the token
-           const decoded = jwt.verify(token, JWT_USER_PASSWORD_PASSWORD);
+           const decoded = jwt.verify(token, JWT_USER_PASSWORD);
+           console.log(decoded);
            req.userId = decoded.id; // Attach the userId to the request
+        //    console.log(decode.id +"sjduus");
+           
            next(); // Call next middleware or route handler
        } catch (err) {
-           return res.status(401).send("Authentication failed: Invalid or expired token.");
+           return res.status(401).send(err);
        }
     }
     

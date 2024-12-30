@@ -67,7 +67,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login route (to be implemented)
-router.get('/login',async (req, res) => {
+router.post('/login',async (req, res) => {
     // res.send("Login endpoint is under development.");
     const credentials = loginSchema.safeParse(req.body)
     if(!credentials.success){
@@ -99,7 +99,10 @@ router.get('/login',async (req, res) => {
             maxAge : 24 * 60 * 60 * 1000
 
         });
-        res.status(200).send("Login succesfull")
+        // const temp =  res.cookies.auth_cookie 
+        // console.log( res.cookies.auth_cookie );
+        
+        res.status(200).send("sab sahi")
     }
     catch(error){
         console.log(error)
