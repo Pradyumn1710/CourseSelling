@@ -1,17 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Users, BookOpen, GraduationCap } from 'lucide-react';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 
 export default function HeroHeader() {
     const [stats, setStats] = useState({
-      totalCourses: '10k+',
-      expertMentors: '500+',
-      totalStudents: '300k+',
     });
   
-    useEffect(() => {
-    //   fetchStats().then((data) => setStats(data)).catch(console.error);
-    }, []);
+    
+
+      useEffect(() => {
+        const fetchStats = async () => {
+          try {
+            console.log("Try k andar hu")
+            const response = await axios.get('http://localhost:3000/routes/other/stats');
+            const { 
+                totalUsers,
+                totalAdmins,
+                totalCourses } = response.data;
+            setStats({ 
+                totalUsers,
+                totalAdmins,
+                totalCourses });
+          } catch (error) {
+            console.error('Error fetching stats:', error);
+          }
+        };
+    
+        fetchStats();
+      }, []);
   
     return (
       <div className="relative overflow-hidden bg-background pt-24">
@@ -22,21 +44,20 @@ export default function HeroHeader() {
         <div className="container mx-auto px-4 py-16">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left column - Text content */}
-            <div className="space-y-8">
+            <div className="space-y-8 ml-6">
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
                 Getting <span className="text-primary">Quality</span> Education Is Now More{' '}
                 <span className="text-primary">Easy</span>
               </h1>
   
               <p className="text-muted-foreground text-lg max-w-md">
-                Provides you with the latest online learning system and material that help your knowledge
-                growing.
+              Explore courses in various fields and start your learning journey today.
               </p>
   
               <div className="flex flex-wrap gap-4">
                 <Button size="lg">Get Started</Button>
                 <Button variant="outline" size="lg">
-                  Get free trial
+                <Link to='/courses'> All Courses</Link>
                 </Button>
               </div>
             </div>
@@ -44,7 +65,7 @@ export default function HeroHeader() {
             {/* Right column - Image */}
             <div className="relative">
               <img
-                src="/placeholder.svg?height=400&width=400"
+                src="/photos/img1.gif"
                 alt="Student with educational materials"
                 className="relative z-10 mx-auto"
               />
@@ -68,7 +89,7 @@ export default function HeroHeader() {
                 <Users className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">{stats.expertMentors}</div>
+                <div className="text-2xl font-bold text-primary">{stats.totalAdmins}</div>
                 <div className="text-muted-foreground">Expert Mentors</div>
               </div>
             </div>
@@ -78,7 +99,7 @@ export default function HeroHeader() {
                 <GraduationCap className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">{stats.totalStudents}</div>
+                <div className="text-2xl font-bold text-primary">{stats.totalUsers}</div>
                 <div className="text-muted-foreground">Students Globally</div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 'use client'
-import { TypeAnimation } from "react-type-animation";
+
 import { BrowserRouter, Link } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 import { useState, useEffect } from 'react'
@@ -25,9 +25,9 @@ export default function Homepage() {
   return (
     <div>
       <div className='flex justify-between border border-red'>
-            <BrowserRouter>
+            
             <Navbar_left/>
-            <Navbar_right/></BrowserRouter>
+            <Navbar_right/>
             
       </div>
       <HeroHeader />
