@@ -1,55 +1,52 @@
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import axios from 'axios'
-// import { log } from 'console'
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
+import {  Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export default function Signin() {
+export default function Login() {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
-  })
+  });
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    if (e.target.name === "username") {
-      setFormData({ ...formData, username: e.target.value });
-    } else if (e.target.name === "password") {
-      setFormData({ ...formData, password: e.target.value });
-    }
-  
-    console.log("Updated Form Data:", formData);
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    console.log("just before sending data -" , formData);
-    const temp = {
-      "username": "test11",
-      "password":"Test1@123"
-  }
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+
     try {
-      // console.log("Fuckkkkkkkkkkkkkkkkkkkkk you ")
-      const response = await axios.post('http://localhost:3000/routes/user_authentication/login', formData, 
-        {
-          headers: { 'Content-Type': 'application/json' },
-          withCredentials: true, // Allows cookies to be sent/received
-      }
-      );
-      console.log("Login successful:", response.data);
-      } catch (error) {
-        console.log("Error during login:", error);
-      }
+      const response = await axios.post('http://localhost:3000/routes/user_authentication/login', formData, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      console.log('Login successful:', response.data);
+      setSuccess(true);
+      // Handle successful login (e.g., redirect to homepage)
+    } catch (error) {
+      console.error('There was an error during login:', error);
+      // Handle login error (e.g., display error message)
+    }
+  };
+
+  if (success) {
+    navigate('/');
   }
+
   return (
     <div className="flex h-screen">
       <div className="w-[30%] flex items-center justify-center bg-background">
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>Enter your credentials to access your account.</CardDescription>
+            <h2 className="text-2xl font-semibold">Sign In</h2>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
@@ -75,6 +72,5 @@ export default function Signin() {
         {/* You can replace the placeholder image with your actual image */}
       </div>
     </div>
-  )
+  );
 }
-

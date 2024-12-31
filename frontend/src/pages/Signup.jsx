@@ -4,8 +4,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const [success , setSuccess] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
     firstname: '',
@@ -29,16 +32,17 @@ export default function Signup() {
             }
           });
           console.log("Signup successful",response.data);
-          
-
-
+          setSuccess(true)
     }
     catch(error){
-        console.log("There was error during signup.");
+        console.log("There was error during signup.", error);
         
     }
   }
 
+  if (success) {
+    navigate('/login');
+  }
   return (
     <div className="flex h-screen">
       <div className="w-[30%] flex items-center justify-center bg-background">

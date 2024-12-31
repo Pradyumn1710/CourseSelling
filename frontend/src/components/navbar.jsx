@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { Button } from "@/components/ui/button"
+// import Cookies from 'js-cookie';
+// import jwt from 'jsonwebtoken';
+import axios from 'axios';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 
 export function Navbar_left() {
     const [active, setActive] = useState(null);
@@ -28,6 +33,26 @@ export function Navbar_left() {
 export function Navbar_right() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual authentication logic
   const [userName, setUserName] = useState("John Doe"); // Replace with the actual user's name
+  // const temp = Cookies.get('auth_cookie'); // Replace 'username' with the actual cookie name
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/routes/other/verifytoken', {
+          withCredentials: true // Ensure cookies are sent with the request
+        });
+        console.log(response.data.username)
+        setUserName(response.data.username);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error('Error verifying token:', error);
+      }
+    };
+
+    verifyToken();
+  }, []);
+
+
+  
 
   return (
     <div className="fixed top-4 right-0 w-auto mt-7 mr-16 z-50 bg-white shadow-md rounded-full bg-opacity-50 border border-transparent dark:bg-black dark:border-white/[0.2] rounded-tl-none min-w-[200px] overflow-hidden">
