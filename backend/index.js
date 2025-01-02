@@ -3,15 +3,16 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
-// Apply middleware
+
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from this origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
-    credentials: true, // Allow cookies if necessary
+    origin: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    credentials: true, 
 }));
 app.use(cookieParser());
+app.use(express.json());
 
-// Import and use routes
+
 const routes = require('./routes/index.js');
 app.use('/routes', routes);
 
