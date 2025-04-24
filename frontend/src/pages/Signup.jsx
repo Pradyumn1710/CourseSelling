@@ -9,6 +9,7 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { ArrowRight, User } from "lucide-react"
 import { useEffect } from "react"
+import {Switch} from '../components/ui/switch'
 // import { log } from "console"
 
 
@@ -32,6 +33,8 @@ export default function Signup() {
   const navigate = useNavigate()
   const [success, setSuccess] = useState(false)
   const [usernameError, setUsernameError] = useState(false);
+  const [admin,isAdmin] = useState(false);
+
 
   const [formData, setFormData] = useState({
     username: "",
@@ -51,7 +54,7 @@ export default function Signup() {
   const debouncedFirstname = useDebounce(formData.firstname,300)
   const debouncedLastname = useDebounce(formData.lastname, 300)
   const debouncedPassword = useDebounce(formData.password, 300)
-  console.log(debouncedPassword);
+  // console.log(debouncedPassword);
 
   useEffect(() => {
     if (debouncedFirstname.trim() !== "") {
@@ -119,11 +122,16 @@ export default function Signup() {
     if (Object.values(newError).some((msg) => msg !== "")) return
 
 
-    console.log("Form submitted:", formData)
+    // console.log("Form submitted:", formData)
+
+    const signupUrl = admin
+    ? "http://localhost:3000/routes/admin_authentication/signup"
+    : "http://localhost:3000/routes/user_authentication/signup"
+
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/routes/user_authentication/signup",
+        signupUrl,
         formData,
         {
           headers: {
@@ -135,16 +143,23 @@ export default function Signup() {
       console.log("Signup successful", response.data)
       setSuccess(true)
       setUsernameError(false) // clear any error
-    } catch (error) {
+    }  catch (error) {
       if (
-        error.response.status === 400
+        error.response.status === 400 &&
+        error.response.data.message === 'Username already exists'
       ) {
-        console.log("Username exists error caught")
-        setUsernameError(true)
+        console.log("Username exists error caught");
+        console.log(error.response.data.error);
+    
+        setUsernameError(true);
+      } else if (error.response.status === 400) {
+        console.log("Signup failed due to incorrect credentials format");
+        setSuccess(false);
+        alert("Please provide credentials in the correct format.");
       } else {
-        console.log("Signup failed with some other error", error)
+        console.log("Signup failed with some other error", error);
+        setSuccess(false);
       }
-      setSuccess(false)
     }
   }
 
@@ -154,7 +169,7 @@ export default function Signup() {
       navigate("/login");
     }
   }, [success, navigate]);
-console.log(formErrors.username);
+// console.log(formErrors.username);
   return (
     <div className="flex h-screen">
       <div className="w-[30%] flex items-center justify-center bg-background relative overflow-hidden">
@@ -220,7 +235,14 @@ console.log(formErrors.username);
                   className="h-11"
                 />
                 {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
-              </div>
+              </div >
+                  <div className="flex">
+                    <Label htmlFor='admin'>Are you an Instructor</Label>
+                      <Switch
+                      checked={admin}
+                      onCheckedChange={(val) => isAdmin(val)}
+                      ></Switch>
+                  </div>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">

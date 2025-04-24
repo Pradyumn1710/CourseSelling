@@ -1,88 +1,149 @@
-import React, { useState , useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Link as ScrollLink } from 'react-scroll';
+"use client"
+
+import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import axios from "axios"
+import { LogOut, Settings, User } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
-// import Cookies from 'js-cookie';
-// import jwt from 'jsonwebtoken';
-import axios from 'axios';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useAdmin } from "./AdminContext"
 
-
-export function Navbar_left() {
-    const [active, setActive] = useState(null);
-
-    return (
-        <div className="fixed top-4 inset-x-0 max-w-4xl mt-7 ml-16 z-50 bg-white shadow-md rounded-full bg-opacity-50 border border-transparent dark:bg-black dark:border-white/[0.2] rounded-tr-none">
-            <div className="flex justify-between items-center py-1 px-4">
-                <img src="/photos/logo.png" alt="Logo" className="h-12 mx-2" // Change h-8 to h-12 for larger size
-                    style={{ marginRight: 'auto', marginLeft: '0', alignSelf: 'center' }} // Align to left and center vertically
-                />
-                <div className='text-2xl font-semibold text-black'>Skillo</div>
-                <div className="flex flex-1 justify-evenly items-center space-x-2">
-                    <ScrollLink to="home" smooth={true} duration={500} className="text-lg font-semibold text-black cursor-pointer hover:underline">
-                        Home
-                    </ScrollLink>
-                    <Link to="/courses" className="text-lg font-semibold text-black hover:underline">Courses</Link>
-                    <Link to="/about" className="text-lg font-semibold text-black hover:underline">About</Link>
-                    {/* <Link to="/" className="text-lg font-semibold text-black hover:underline">Contact</Link> */}
-                </div>
-            </div>
-        </div>
-    );
-}
 export function Navbar_right() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual authentication logic
-  const [userName, setUserName] = useState("John Doe"); // Replace with the actual user's name
-  // const temp = Cookies.get('auth_cookie'); // Replace 'username' with the actual cookie name
+  const { admin } = useAdmin()
+  const [userName, setUserName] = useState("John Doe")
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/routes/other/verifytoken', {
-          withCredentials: true // Ensure cookies are sent with the request
-        });
-        console.log(response.data.username)
-        setUserName(response.data.username);
-        setIsLoggedIn(true);
+        const response = await axios.get("http://localhost:3000/routes/other/verifytoken", {
+          withCredentials: true,
+        })
+        setUserName(response.data.username)
+        setIsLoggedIn(true)
       } catch (error) {
-        console.error('Error verifying token:', error);
+        console.error("Error verifying token:", error)
       }
-    };
+    }
 
-    verifyToken();
-  }, []);
+    verifyToken()
+  }, [])
 
-
-  
+  const handleLogout = async () => {
+    try {
+      // Add your logout logic here
+      console.log("Logging out...")
+      // Example: await axios.post('/api/logout')
+      setIsLoggedIn(false)
+    } catch (error) {
+      console.error("Error logging out:", error)
+    }
+  }
 
   return (
-    <div className="fixed top-4 right-0 w-auto mt-7 mr-16 z-50 bg-white shadow-md rounded-full bg-opacity-50 border border-transparent dark:bg-black dark:border-white/[0.2] rounded-tl-none min-w-[200px] overflow-hidden">
-      <div className="flex justify-between items-center py-1 px-4">
-        <div className="flex items-center gap-4">
-          {isLoggedIn ? (
+    <div className="fixed top-4 right-0 w-auto mt-7 mr-16 z-50 bg-white shadow-lg rounded-full border border-gray-200 dark:bg-gray-800 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-xl">
+      <div className="flex justify-between items-center py-2 px-5">
+        {isLoggedIn ? (
+          <div className="flex items-center gap-3">
+            <span className="text-base font-medium text-gray-800 dark:text-gray-200">Hi, {userName}</span>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 hover:bg-gray-100">
+                  <Avatar className="h-9 w-9 border-2 border-white transition-transform hover:scale-105">
+                    <AvatarImage src="https://github.com/shadcn.png" alt={userName} />
+                    <AvatarFallback className="bg-primary text-primary-foreground">{userName.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <Link to="/profile" className="w-full">
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <Link to="/settings" className="w-full">
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Button variant="ghost" className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+              <Link to="/signup">Sign up</Link>
+            </Button>
+            <Button variant="default" className="bg-primary text-white hover:bg-primary/90 transition-colors">
+              <Link to="/login">Login</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+export function Navbar_left() {
+  const { admin } = useAdmin()
+
+  return (
+    <div className="navbar-left border-b border-gray-200 bg-white/90 backdrop-blur-sm shadow-sm">
+      <div className="flex items-center py-3 px-6">
+        <Link to="/" className="flex items-center group">
+          <img
+            src="/photos/logo.png"
+            alt="Logo"
+            className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="text-2xl font-bold text-gray-800 ml-2 group-hover:text-primary transition-colors">Skillo</div>
+        </Link>
+
+        <div className="flex flex-1 justify-center items-center space-x-8 ml-8">
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/courses">Courses</NavLink>
+          <NavLink to="/about">About</NavLink>
+
+          {admin === true && (
             <>
-              <span className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                Hi, {userName}
-              </span>
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-              </Avatar>
+              <NavLink to="/add-course">Add Course</NavLink>
+              <NavLink to="/manage-course">Manage Course</NavLink>
             </>
-          ) : (
-            <div className="flex gap-2">
-              <Button variant="ghost" className="text-lg font-semibold text-black cursor-pointer hover:underline">
-                <Link to='/signup'> Sign up</Link>
-              </Button>
-              <Button
-                variant="default"
-                className=" bg-primary white text-lg font-semibold text-white cursor-pointer"
-              >
-                <Link to='/login'> Login</Link>
-              </Button>
-            </div>
           )}
+
+          {admin === false && <NavLink to="/my-courses">My Courses</NavLink>}
         </div>
       </div>
     </div>
-  );
+  )
+}
+
+// Helper component for navigation links with consistent styling
+function NavLink({ to, children }) {
+  return (
+    <Link to={to} className="text-gray-700 font-medium px-3 py-2 rounded-md relative group">
+      <span className="relative z-10">{children}</span>
+      <span className="absolute inset-0 bg-gray-100 rounded-md scale-0 group-hover:scale-100 transition-transform duration-200 origin-center z-0 opacity-0 group-hover:opacity-100"></span>
+    </Link>
+  )
 }

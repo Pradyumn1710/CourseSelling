@@ -8,8 +8,13 @@ import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowRight, Lock } from "lucide-react"
+import {Switch} from '../components/ui/switch'
 
 export default function Login() {
+  const [admin,isAdmin]= useState(false)
+  const [usernameError, setUsernameError] = useState(false)
+const [passwordError, setPasswordError] = useState(false)
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -18,6 +23,8 @@ export default function Login() {
   const navigate = useNavigate()
 
   const handleChange = (e) => {
+    setPasswordError(false)
+    setUsernameError(false)
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
@@ -25,19 +32,40 @@ export default function Login() {
     e.preventDefault()
     console.log("Form submitted:", formData)
 
+    const loginUrl = admin
+    ? "http://localhost:3000/routes/admin_authentication/login"
+    : "http://localhost:3000/routes/user_authentication/login"
+
     try {
-      const response = await axios.post("http://localhost:3000/routes/user_authentication/login", formData, {
+      const response = await axios.post(loginUrl, formData, {
         headers: {
           "Content-Type": "application/json",
         },
+        withCredentials : true
       })
       
       console.log("Login successful:", response.data)
+      setUsernameError(false)
+      setPasswordError(false)
       setSuccess(true)
-    } catch (error) {
-      console.error("There was an error during login:", error)
+  } catch (error) {
+    console.log(error);
+    if (error.response?.status === 400) {
+      const message = error.response.data.msg
+      if (message === "Invalid username" ) {
+
+        setUsernameError(true)
+        setPasswordError(false)
+      } else if (message === "Invalid password") {
+        setPasswordError(true)
+        setUsernameError(false)
+      }
+    } else {
+      console.error("Unexpected login error:", error)
     }
+    setSuccess(false)
   }
+}
 
   if (success) {
     navigate("/")
@@ -64,10 +92,12 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="username">Username</Label>
+                {usernameError && <p className="text-sm text-red-500">Incorrect username</p>}
                 <Input id="username" name="username" placeholder="johndoe" onChange={handleChange} className="h-11" />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="password">Password</Label>
+                {passwordError && <p className="text-sm text-red-500">Incorrect password</p>}
                 <Input
                   id="password"
                   name="password"
@@ -77,11 +107,19 @@ export default function Login() {
                   className="h-11"
                 />
               </div>
+              <div className="flex">
+                                  <Label htmlFor='admin'>Are you an Instructor</Label>
+                                    <Switch
+                                    checked={admin}
+                                    onCheckedChange={(val) => isAdmin(val)}
+                                    ></Switch>
+                                </div>
               <div className="flex items-center justify-end">
                 <a href="#" className="text-sm text-primary hover:underline">
                   Forgot password?
                 </a>
               </div>
+              
             </form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">

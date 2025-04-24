@@ -1,10 +1,10 @@
 'use client'
 
-import { BrowserRouter, Link } from "react-router-dom";
-import { Link as ScrollLink } from "react-scroll";
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Users, BookOpen, GraduationCap } from 'lucide-react'
+// import { BrowserRouter, Link } from "react-router-dom";
+// import { Link as ScrollLink } from "react-scroll";
+// import { useState, useEffect } from 'react'
+// import { Button } from "@/components/ui/button"
+// import { Users, BookOpen, GraduationCap } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import PopularCourses from "@/components/courses";
 import  Footer  from "@/components/footer";
